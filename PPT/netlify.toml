@@ -1,0 +1,46 @@
+# ---------------------------------------------------------------
+# SlideCraft Studio — Netlify configuration
+#
+# This is a zero-build static app: Tailwind CSS, PptxGenJS,
+# html-to-image, html2canvas and jsPDF are all delivered via CDN, so there is
+# no Node build step. Netlify simply serves the repository root.
+#
+#   1. Drag & drop this whole folder onto Netlify, OR
+#   2. Push it to a Git repo connected to Netlify.
+#
+# The `publish` directory below is the repo root (".").
+# ---------------------------------------------------------------
+[build]
+  publish = "."
+  command = ""
+
+# Unknown routes → the themed 404 page (with a real 404 status), matching the
+# local `serve.js` behavior. The app itself is a single page with no path
+# routing (all state lives in localStorage), so nothing else needs a redirect.
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# Security headers applied to every response.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-XSS-Protection = "1; mode=block"
+
+# app.js changes frequently (zero-build app), so revalidate on every load.
+# Do NOT mark this immutable: a long cache would keep the old app.js running
+# against new HTML after a redeploy (content silently stops saving/appearing).
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Snapshots / templates — cache a day.
+[[headers]]
+  for = "/components/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

@@ -1,0 +1,45 @@
+# Netlify configuration for the REPOSITORY ROOT layout.
+#
+# The repo contains the whole project:
+#   PPT/      → the deployable website (the real site root)
+#   desktop/  → Electron app shell (built by .github/workflows/build-mac.yml)
+#
+# Netlify reads this file automatically, so connect the repo with:
+#   Build command:    (leave blank)
+#   Publish directory: PPT      ← set automatically by this file
+#
+# If you ever deploy the PPT/ folder alone, use PPT/netlify.toml instead
+# (it is identical, with publish = ".").
+
+[build]
+  publish = "PPT"
+  command = ""
+
+# Unknown routes → the themed 404 page inside the site.
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# Security headers applied to every response.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-XSS-Protection = "1; mode=block"
+
+# app.js changes frequently (zero-build app), so revalidate on every load.
+# Do NOT mark this immutable: a long cache would keep the old app.js running
+# against new HTML after a redeploy (content silently stops saving/appearing).
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Snapshots / templates — cache a day.
+[[headers]]
+  for = "/components/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

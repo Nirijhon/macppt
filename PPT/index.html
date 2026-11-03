@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Mount Of Moriah Church</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230B192C%22/><rect x=%228%22 y=%228%22 width=%2284%22 height=%2284%22 fill=%22%23050C16%22/><circle cx=%2250%22 cy=%2250%22 r=%2226%22 fill=%22%23FFD700%22/></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+    @layer utilities {
+      /* Animations */
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      
+      @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      .animate-fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      
+      @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+      .animate-scale-in { animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      
+      .slide-flash { animation: slideFlash 0.9s ease-out; }
+      @keyframes slideFlash { 0% { background-color: rgba(255,215,0,0); } 40% { background-color: rgba(255,215,0,0.16); } 100% { background-color: rgba(255,215,0,0); } }
+      
+      .cq-container { container-type: inline-size; }
+      /* Anti-widow: balance headline lines so no single word is stranded */
+      .cq-container h1, .cq-container h2, .cq-container h3 { text-wrap: balance; text-wrap-style: balance; }
+      
+      /* ============================================================
+         GLASSMORPHISM DESIGN SYSTEM
+         Frosted-glass surfaces that blur a vivid aurora background.
+         ============================================================ */
+
+      /* Frosted glass surfaces */
+      .glass { 
+        background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+        -webkit-backdrop-filter: blur(22px) saturate(160%);
+        backdrop-filter: blur(22px) saturate(160%);
+        border: 1px solid rgba(255,255,255,.14);
+        box-shadow: 0 16px 40px rgba(2,6,23,.45), inset 0 1px 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(255,255,255,.04);
+      }
+      .glass-strong { 
+        background: linear-gradient(165deg, rgba(20,30,60,.72), rgba(10,16,40,.55));
+        -webkit-backdrop-filter: blur(26px) saturate(170%);
+        backdrop-filter: blur(26px) saturate(170%);
+        border: 1px solid rgba(255,255,255,.18);
+        box-shadow: 0 24px 60px rgba(2,6,23,.55), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.05);
+      }
+      .glass-chip { 
+        background: rgba(255,255,255,.08);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,.16);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+      }
+
+      /* Glass navbar */
+      .glass-header { 
+        background: linear-gradient(180deg, rgba(10,15,36,.72), rgba(10,15,36,.40));
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        backdrop-filter: blur(24px) saturate(160%);
+        border-bottom: 1px solid rgba(255,255,255,.14);
+        box-shadow: 0 10px 34px rgba(2,6,23,.4), inset 0 1px 0 rgba(255,255,255,.12);
+      }
+
+      /* Glass placeholder for the empty preview */
+            .glass-placeholder {
+        background: rgba(255,255,255,.04);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1.5px dashed rgba(255,255,255,.18);
+      }
+
+      /* Slide-queue drag-and-drop reordering */
+      .slide-item.drag-over-top {
+        border-top: 2px solid #fbbf24;
+        box-shadow: inset 0 0 0 2px rgba(251,191,36,.25);
+      }
+      .slide-item.drag-over-bottom {
+        border-bottom: 2px solid #fbbf24;
+        box-shadow: inset 0 0 0 2px rgba(251,191,36,.25);
+      }
+      .slide-item.opacity-50 {
+        opacity: 0.5;
+      }
+      .drag-handle {
+        cursor: grab;
+      }
+      .drag-handle:active {
+        cursor: grabbing;
+      }
+      
+      /* Template cards — frosted chrome around the slide-design previews */
+      .template-card { 
+        @apply transition-all duration-300 ease-out;
+        background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04));
+        -webkit-backdrop-filter: blur(16px) saturate(150%);
+        backdrop-filter: blur(16px) saturate(150%);
+        border: 1px solid rgba(255,255,255,.18);
+        box-shadow: 0 14px 34px rgba(2,6,23,.4), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.05);
+      }
+      .template-card:hover { 
+        @apply -translate-y-1.5 scale-[1.02];
+        border-color: rgba(255,215,0,.6);
+        box-shadow: 0 24px 48px rgba(2,6,23,.5), 0 0 0 3px rgba(255,215,0,.16), inset 0 1px 0 rgba(255,255,255,.3);
+      }
+      .template-card[data-selected="true"] { 
+        @apply ring-2 ring-amber-400 border-amber-400;
+        box-shadow: 0 20px 44px rgba(2,6,23,.55), 0 0 0 2px rgba(255,215,0,.32), inset 0 1px 0 rgba(255,255,255,.32);
+      }
+
+      /* Text helpers — midnight aurora heading: soft indigo → lavender → white */
+      .text-aurora-heading { 
+        background: linear-gradient(120deg, #C7D2FE 0%, #A5B4FC 30%, #C4B5FD 65%, #FFFFFF 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+      }
+
+      /* Modals */
+      .modal-backdrop { 
+        background: rgba(4,8,22,.55);
+        -webkit-backdrop-filter: blur(10px) saturate(120%);
+        backdrop-filter: blur(10px) saturate(120%);
+        animation: fadeIn 0.2s ease-out;
+      }
+      .modal-content {
+        /* Theme tokens — default to Sermon Classic (gold & navy); JS
+           rewrites these live whenever the selected template changes. */
+        --accent: #FFD700;
+        --accentSoft: rgba(255,215,0,.14);
+        --accentBorder: rgba(255,215,0,.42);
+        --accentGlow: rgba(255,215,0,.5);
+        --label: #FFF3B0;
+        --gradFrom: #FFD700;
+        --gradTo: #FBBF24;
+        --onAccent: #0B192C;
+        position: relative;
+        background: linear-gradient(165deg, rgba(20,30,60,.8), rgba(10,16,40,.62));
+        -webkit-backdrop-filter: blur(26px) saturate(170%);
+        backdrop-filter: blur(26px) saturate(170%);
+        border: 1px solid rgba(255,255,255,.18);
+        box-shadow: 0 24px 60px rgba(2,6,23,.55), 0 0 0 1px var(--accentSoft), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.05);
+        border-radius: 1.25rem;
+        /* Tall content (e.g. the 9-theme picker) must scroll inside the modal
+           instead of being clipped by the old `overflow: hidden`. */
+        max-height: calc(100vh - 2rem);
+        overflow-x: hidden;
+        overflow-y: auto;
+        animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      /* Slim, theme-tinted scrollbar for scrollable modals */
+      .modal-content::-webkit-scrollbar { width: 8px; }
+      .modal-content::-webkit-scrollbar-track { background: transparent; }
+      .modal-content::-webkit-scrollbar-thumb {
+        background: var(--accentBorder); border-radius: 8px;
+      }
+      .modal-content::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+      /* Accent bar along the top of the modal, tinted to the theme */
+      .modal-content::before {
+        content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; z-index: 3;
+        background: linear-gradient(90deg, var(--gradFrom), var(--gradTo));
+        box-shadow: 0 1px 10px var(--accentGlow);
+      }
+      /* Soft accent bloom in the corner for depth */
+      .modal-content::after {
+        content: ""; position: absolute; top: -46px; right: -30px; width: 200px; height: 200px;
+        background: radial-gradient(circle, var(--accentGlow), transparent 70%);
+        opacity: .4; pointer-events: none; border-radius: 9999px; z-index: 0;
+      }
+      .modal-content > * { position: relative; z-index: 1; }
+      /* Frost every modal input so fields are glass too */
+      .modal-content input[type="text"],
+      .modal-content textarea {
+        background: rgba(0,0,0,.24) !important;
+        border-color: rgba(255,255,255,.14) !important;
+        color: #fff !important;
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+        transition: border-color .2s, box-shadow .2s;
+      }
+      .modal-content input[type="text"]::placeholder,
+      .modal-content textarea::placeholder { color: rgba(229,236,247,.5) !important; }
+      .modal-content input[type="text"]:focus,
+      .modal-content textarea:focus {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 4px var(--accentSoft), inset 0 1px 0 rgba(255,255,255,.1);
+      }
+      /* Field labels take the template's accent */
+      .modal-content label { color: var(--label) !important; }
+      /* "+ Add Highlight" secondary buttons follow the theme too */
+      .modal-content .bg-amber-500\/15,
+      .modal-content .bg-amber-500\/30 {
+        background-color: var(--accentSoft) !important;
+        border-color: var(--accentBorder) !important;
+        color: var(--label) !important;
+      }
+      /* The big confirm button — gradient straight from the template palette */
+      .modal-content [id$="-modal-submit"] {
+        background: linear-gradient(90deg, var(--gradFrom), var(--gradTo)) !important;
+        color: var(--onAccent) !important;
+        box-shadow: 0 10px 26px var(--accentSoft) !important;
+      }
+
+      .toast-item { 
+        animation: toastIn 0.3s ease, toastOut 0.3s 4.7s;
+        background: rgba(14,20,40,.7) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+        backdrop-filter: blur(18px) saturate(150%);
+        border: 1px solid rgba(255,255,255,.18) !important;
+        box-shadow: 0 18px 44px rgba(2,6,23,.55), inset 0 1px 0 rgba(255,255,255,.14);
+      }
+      @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+      @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+      /* Standardized buttons */
+      .btn-primary { @apply px-6 py-2.5 rounded-xl text-white font-medium transition-all active:scale-95; background: rgba(255,255,255,.10); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 10px 24px rgba(2,6,23,.35); }
+      .btn-primary:hover { background: rgba(255,255,255,.16); }
+      .btn-accent { @apply px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-bold hover:from-amber-400 hover:to-amber-300 transition-all active:scale-95 shadow-lg shadow-amber-500/30; }
+      .btn-glass { 
+        @apply px-4 py-2 rounded-xl text-white text-sm flex items-center gap-2 transition-all active:scale-95;
+        background: rgba(255,255,255,.08);
+        -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.18);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 8px 20px rgba(2,6,23,.3);
+      }
+      .btn-glass:hover { background: rgba(255,255,255,.14); border-color: rgba(255,215,0,.5); }
+
+      /* Enhanced empty state */
+      .empty-state { 
+        @apply flex flex-col items-center justify-center py-12 px-4 text-center;
+      }
+      .empty-state-icon { 
+        @apply w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-400/10 flex items-center justify-center mb-4;
+      }
+
+      /* ============================================================
+         PHOTO BACKGROUND — image.png with a soft blur + twilight fade.
+         "Professional, lightly blurred, fading" look: the photo sits
+         fixed behind the glass UI, gently blurred (enough detail stays
+         visible), then faded through a dark gradient so the panels and
+         text stay readable. Tweak `blur(...)` (1–12px) to taste.
+         ============================================================ */
+      body {
+        position: relative;
+        background-color: #0A1226; /* fallback while the photo loads */
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0; right: 0; bottom: 0; left: 0;
+        z-index: -1;
+        pointer-events: none;
+        background-image: var(--theme-bg, url('image.png'));
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        filter: blur(5px) saturate(125%) brightness(1.02);
+        transform: scale(1.07); /* hides the softened edges */
+      }
+      body.crisp-bg::before {
+        filter: none !important;
+        transform: none !important;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0; right: 0; bottom: 0; left: 0;
+        z-index: -1;
+        pointer-events: none;
+        background: linear-gradient(170deg,
+          rgba(6, 12, 28, .68) 0%,
+          rgba(9, 17, 38, .42) 45%,
+          rgba(24, 16, 48, .74) 100%);
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100 font-sans overflow-y-auto animate-fade-in" style="background-color:#0A1226;">
+
+  <!-- Header -->
+  <header class="glass-header sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl glass-chip flex items-center justify-center overflow-hidden"><img src="logo.png" alt="SlideCraft Studio logo" class="w-full h-full object-cover" /></div>
+        <div>
+          <h1 class="text-xl font-bold text-white leading-tight">Mount Of Moriah Church</h1>
+          <span class="text-xs text-slate-400 font-medium tracking-wide">PRESENTATION BUILDER</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="app.exportToPowerPoint()" id="download-pptx-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl glass-chip text-white text-sm font-bold hover:brightness-110 transition">
+          <i class="fa-solid fa-file-powerpoint text-orange-400"></i> PPTX
+        </button>
+        <button onclick="app.exportToPowerPointEditable()" id="download-pptx-editable-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl glass-chip text-white text-sm font-bold hover:brightness-110 transition">
+          <i class="fa-solid fa-pen-to-square text-sky-400"></i> PPTX (Editable)
+        </button>
+        <button onclick="app.exportPDF()" id="download-pdf-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl glass-chip text-white text-sm font-bold hover:brightness-110 transition">
+          <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+        </button>
+        <button onclick="window.location.reload()" class="w-10 h-10 rounded-xl glass-chip text-slate-300 hover:text-white transition flex items-center justify-center"><i class="fa-solid fa-rotate-right"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- DASHBOARD -->
+  <section id="view-step-1" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 hidden animate-fade-in-up">
+    <div class="glass rounded-3xl px-6 py-14 sm:px-12 flex flex-col items-center text-center max-w-3xl mx-auto relative overflow-hidden">
+      <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-indigo-500/25 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-28 -left-24 w-72 h-72 rounded-full bg-violet-500/25 blur-3xl pointer-events-none"></div>
+      <div class="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-chip">
+        <span class="w-2 h-2 rounded-full bg-violet-400 ring-2 ring-violet-500/40"></span>
+        <span class="text-xs font-medium text-violet-200">Sermon Presentation Builder</span>
+      </div>
+      <h2 class="text-5xl sm:text-6xl font-black text-aurora-heading mb-5">Mount Of Moriah Church</h2>
+      <p class="text-slate-300 max-w-lg mb-10">Build a branded sermon presentation. Choose a template, add slides, preview them live, then download a print-ready PDF.</p>
+      <div class="flex justify-center">
+        <button onclick="app.goToStep(2)" class="px-10 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-[#0B192C] font-black text-xl hover:brightness-110 transition shadow-2xl shadow-amber-500/35">Start Building</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEMPLATES -->
+  <section id="view-step-2" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 hidden animate-fade-in-up">
+    <div class="glass rounded-3xl p-5 sm:p-8">
+    <div class="mb-8 flex items-center justify-between">
+      <h2 class="text-2xl font-bold text-aurora-heading">Choose a Template</h2>
+      <span class="text-xs text-slate-300 glass-chip px-3 py-1.5 rounded-full">15 themes</span>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div data-template="Sermon Classic" data-selected="true" onclick="app.selectTemplate('Sermon Classic')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #FFD700;background:linear-gradient(180deg,#0B192C,#050C16);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#0B192C;border:3px solid #FFD700;">
+          <span class="absolute top-[2px] left-[2px] right-[2px] h-1 rounded-sm bg-[#FFD700]"></span>
+          <span class="absolute top-[9px] left-[3px] h-1.5 rounded bg-[#FFFFFF]" style="width:44%;opacity:.84"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#FFF3B0]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#FFFFFF;font-family:'Inter', sans-serif">Sermon Classic</p>
+        <p class="text-xs text-gray-400 mt-0.5">Gold &amp; navy · bold sans-serif</p>
+      </div>
+      <div data-template="Elegant Heritage" data-selected="false" onclick="app.selectTemplate('Elegant Heritage')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #9B2A2E;background:linear-gradient(180deg,#F6EFE6,#E8D9BF);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#F6EFE6;border:3px solid #9B2A2E;">
+          <span class="absolute top-[2px] left-[2px] right-[2px] h-1 rounded-sm bg-[#9B2A2E]"></span>
+          <span class="absolute top-[9px] left-[3px] h-1.5 rounded bg-[#2B2118]" style="width:44%;opacity:.84"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#C05A3B]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#2B2118;font-family:'Georgia', serif">Elegant Heritage</p>
+        <p class="text-xs text-gray-400 mt-0.5">Ivory &amp; burgundy · elegant serif</p>
+      </div>
+      <div data-template="Midnight Aurora" data-selected="false" onclick="app.selectTemplate('Midnight Aurora')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #22D3EE;background:linear-gradient(180deg,#0D1117,#161B22);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#0D1117;border:3px solid #22D3EE;">
+          <span class="absolute top-[2px] left-[2px] right-[2px] h-1 rounded-sm bg-[#22D3EE]"></span>
+          <span class="absolute top-[9px] left-[3px] h-1.5 rounded bg-[#FFFFFF]" style="width:44%;opacity:.84"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#A78BFA]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#FFFFFF;font-family:'Montserrat', sans-serif">Midnight Aurora</p>
+        <p class="text-xs text-gray-400 mt-0.5">Charcoal &amp; neon cyan · modern sans-serif</p>
+      </div>
+      <div data-template="Forest Chapel" data-selected="false" onclick="app.selectTemplate('Forest Chapel')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #D9B36C;background:linear-gradient(180deg,#0E2A1E,#06140E);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#0E2A1E;border:3px solid #D9B36C;">
+          <span class="absolute top-[2px] left-[2px] right-[2px] h-1 rounded-sm bg-[#D9B36C]"></span>
+          <span class="absolute top-[9px] left-[3px] h-1.5 rounded bg-[#F6F1E3]" style="width:44%;opacity:.84"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#F4E4BC]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#F6F1E3;font-family:'Cambria', serif">Forest Chapel</p>
+        <p class="text-xs text-gray-400 mt-0.5">Pine green &amp; gold · elegant serif</p>
+      </div>
+      <div data-template="Lilac Grace" data-selected="false" onclick="app.selectTemplate('Lilac Grace')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #8B5CF6;background:linear-gradient(180deg,#F3EEFC,#E8DDF9);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#F3EEFC;border:3px solid #8B5CF6;">
+          <span class="absolute top-[2px] left-[2px] right-[2px] h-1 rounded-sm bg-[#7C3AED]"></span>
+          <span class="absolute top-[9px] left-[3px] h-1.5 rounded bg-[#2E1065]" style="width:44%;opacity:.84"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#C4B5FD]" style="width:28%"></span>
+          <span class="absolute top-0 left-0 w-[3px] h-[3px] rounded-full bg-[#C4B5FD]"></span>
+          <span class="absolute top-0 right-0 w-[3px] h-[3px] rounded-full bg-[#C4B5FD]"></span>
+          <span class="absolute bottom-0 left-0 w-[3px] h-[3px] rounded-full bg-[#C4B5FD]"></span>
+          <span class="absolute bottom-0 right-0 w-[3px] h-[3px] rounded-full bg-[#C4B5FD]"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#2E1065;font-family:'Palatino', serif">Lilac Grace</p>
+        <p class="text-xs text-gray-400 mt-0.5">Soft lavender &amp; violet · graceful serif</p>
+      </div>
+      <div data-template="Rose Atelier" data-selected="false" onclick="app.selectTemplate('Rose Atelier')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #A64A52;background:linear-gradient(180deg,#FBF5EF,#F2E7DC);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#FBF5EF;border:3px solid #A64A52;">
+          <span class="absolute top-[2px] left-[2px] right-[2px] h-1 rounded-sm bg-[#A64A52]"></span>
+          <span class="absolute top-[9px] left-[3px] h-1.5 rounded bg-[#3A2328]" style="width:44%;opacity:.84"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#E2A9B0]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#3A2328;font-family:'Georgia', serif">Rose Atelier</p>
+        <p class="text-xs text-gray-400 mt-0.5">Ivory &amp; rose · editorial serif</p>
+      </div>
+      <div data-template="Fresh Mint" data-selected="false" onclick="app.selectTemplate('Fresh Mint')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #10B981;background:linear-gradient(180deg,#EAF6F0,#D5EEE3);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#EAF6F0;border:3px solid #10B981;">
+          <span class="absolute top-[2px] left-[2px] right-[2px] h-1 rounded-sm bg-[#10B981]"></span>
+          <span class="absolute top-[9px] left-[3px] h-1.5 rounded bg-[#134E4A]" style="width:44%;opacity:.84"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#6EE7B7]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#134E4A;font-family:'Poppins', sans-serif">Fresh Mint</p>
+        <p class="text-xs text-gray-400 mt-0.5">Pale mint &amp; emerald · crisp sans-serif</p>
+      </div>
+      <div data-template="Ember & Gold" data-selected="false" onclick="app.selectTemplate('Ember & Gold')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #F59E0B;background:linear-gradient(180deg,#1C120C,#2A1B12);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#1C120C;border:3px solid #F59E0B;">
+          <span class="absolute top-[2px] left-[2px] right-[2px] h-1 rounded-sm bg-[#F59E0B]"></span>
+          <span class="absolute top-[9px] left-[3px] h-1.5 rounded bg-[#FFF7ED]" style="width:44%;opacity:.84"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#FB923C]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#FFF7ED;font-family:'Nunito', sans-serif">Ember &amp; Gold</p>
+                <p class="text-xs text-gray-400 mt-0.5">Scorched amber &amp; gold · warm sans-serif</p>
+      </div>
+      <div data-template="Royal Sapphire" data-selected="false" onclick="app.selectTemplate('Royal Sapphire')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #2563EB;background:linear-gradient(180deg,#0B1E3A,#071226);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#0B1E3A;border:3px solid #2563EB;">
+          <span class="absolute top-[2px] left-[2px] right-[2px] h-1 rounded-sm bg-[#2563EB]"></span>
+          <span class="absolute top-[9px] left-[3px] h-1.5 rounded bg-[#EEF2FF]" style="width:44%;opacity:.84"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#3B82F6]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#EEF2FF;font-family:'Barlow', sans-serif">Royal Sapphire</p>
+        <p class="text-xs text-gray-400 mt-0.5">Deep navy &amp; electric sapphire · modern sans-serif</p>
+      </div>
+      <div data-template="Pulpit Grid" data-selected="false" onclick="app.selectTemplate('Pulpit Grid')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #DC2626;background:linear-gradient(180deg,#151515,#0C0C0C);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#151515;border:3px solid #DC2626;">
+          <span class="absolute top-[2px] left-[2px] w-2 h-2 bg-[#DC2626]"></span>
+          <span class="absolute top-[4px] left-[7px] h-1.5 bg-[#FAFAFA]" style="width:52%"></span>
+          <span class="absolute top-[13px] left-[7px] h-1.5 bg-[#FBBF24]" style="width:30%"></span>
+          <span class="absolute bottom-[3px] left-[7px] h-1 bg-[#D4D4D4]" style="width:44%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#FAFAFA;font-family:'Oswald', sans-serif">Pulpit Grid</p>
+        <p class="text-xs text-gray-400 mt-0.5">Charcoal &amp; crimson · bento grid · preaching-first</p>
+      </div>
+      <div data-template="Big Type" data-selected="false" onclick="app.selectTemplate('Big Type')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #E03A2F;background:linear-gradient(180deg,#F5F2EA,#ECE7DC);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#F5F2EA;border:3px solid #141414;">
+          <span class="absolute top-[3px] left-[4px] w-1.5 h-1.5 bg-[#E03A2F]"></span>
+          <span class="absolute top-[8px] left-[9px] h-2 bg-[#141414]" style="width:60%"></span>
+          <span class="absolute top-[17px] left-[9px] h-2 bg-[#141414]" style="width:44%"></span>
+          <span class="absolute top-[30px] left-[4px] right-[4px] h-px bg-[#141414]/40"></span>
+          <span class="absolute bottom-[4px] left-[9px] h-1 bg-[#E03A2F]" style="width:30%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#141414;font-family:'Archivo Black','Arial Black', sans-serif">Big Type</p>
+        <p class="text-xs text-gray-500 mt-0.5">Paper &amp; signal red · full-bleed typographic poster</p>
+      </div>
+      <div data-template="Glory Light" data-selected="false" onclick="app.selectTemplate('Glory Light')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #E8C86A;background:linear-gradient(180deg,#050505,#0A0A0A);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto overflow-hidden" style="width:84px;height:47px;background:#050505;border:2px solid #D4AF37;border-radius:6px;">
+          <span class="absolute" style="left:28px;top:-16px;width:20px;height:100px;background:linear-gradient(180deg,rgba(212,168,44,.5),rgba(212,168,44,.12),rgba(212,168,44,0));transform:rotate(12deg);transform-origin:50% 0;"></span>
+          <span class="absolute" style="left:32px;top:-16px;width:11px;height:100px;background:linear-gradient(180deg,rgba(232,200,106,.75),rgba(232,200,106,.2),rgba(232,200,106,0));transform:rotate(12deg);transform-origin:50% 0;"></span>
+          <span class="absolute" style="left:30px;top:5px;width:26px;height:2.5px;background:rgba(232,200,106,.95);border-radius:1px;"></span>
+          <span class="absolute" style="left:23px;top:12px;width:40px;height:7px;background:rgba(255,255,255,.92);border-radius:1.5px;"></span>
+          <span class="absolute" style="left:32px;top:26px;width:20px;height:1px;background:rgba(212,175,55,.9);"></span>
+          <span class="absolute" style="left:24px;top:31px;width:34px;height:1px;background:rgba(255,255,255,.55);"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#FFFFFF;font-family:'Playfair Display','Georgia',serif">Glory Light</p>
+        <p class="text-xs text-gray-400 mt-0.5">Black &amp; golden beam · cinematic spotlight</p>
+      </div>
+      <div data-template="Celestial Dawn" data-selected="false" onclick="app.selectTemplate('Celestial Dawn')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #C084FC;background:linear-gradient(180deg,#0F0C29,#0A0820);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto overflow-hidden" style="width:84px;height:47px;background:#0F0C29;border:2px solid #C084FC;border-radius:6px;">
+          <span class="absolute" style="left:-6px;top:-8px;width:42px;height:42px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.6),rgba(124,58,237,0) 70%);"></span>
+          <span class="absolute" style="left:56px;top:30px;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,rgba(232,121,249,.5),rgba(232,121,249,0) 70%);"></span>
+          <span class="absolute" style="left:-4px;top:34px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,.45),rgba(34,211,238,0) 70%);"></span>
+          <div class="absolute" style="left:12px;top:8px;width:60px;height:31px;border-radius:7px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.35);">
+            <span class="absolute rounded-sm" style="left:14px;top:10px;width:36px;height:7px;background:rgba(255,255,255,.92);"></span>
+            <span class="absolute rounded-sm" style="left:24px;top:22px;width:16px;height:3.5px;background:rgba(255,255,255,.55);"></span>
+          </div>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#FFFFFF;font-family:'Outfit',sans-serif">Celestial Dawn</p>
+        <p class="text-xs text-gray-400 mt-0.5">Aurora orbs &amp; frosted glass · glassmorphism</p>
+      </div>
+      <div data-template="Split Screen" data-selected="false" onclick="app.selectTemplate('Split Screen')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #E85D26;background:linear-gradient(180deg,#1B1310,#14100C);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto overflow-hidden" style="width:84px;height:47px;background:#1B1310;border:2px solid #E85D26;border-radius:6px;">
+          <span class="absolute" style="left:0;top:0;width:25px;height:100%;background:#E85D26;"></span>
+          <span class="absolute" style="left:25px;top:0;width:1px;height:100%;background:rgba(255,246,236,.5);"></span>
+          <span class="absolute rounded-sm" style="left:4px;top:6px;width:16px;height:2.5px;background:rgba(27,19,16,.85);"></span>
+          <span class="absolute rounded-sm" style="left:4px;bottom:6px;width:12px;height:2px;background:rgba(27,19,16,.6);"></span>
+          <span class="absolute" style="left:19px;top:14px;color:#FFF6EC;font-size:15px;font-weight:800;line-height:1;">02</span>
+          <span class="absolute rounded-sm" style="left:31px;top:13px;width:38px;height:6px;background:rgba(255,246,236,.92);"></span>
+          <span class="absolute rounded-sm" style="left:31px;top:23px;width:26px;height:4px;background:rgba(255,138,80,.85);"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#FFF6EC;font-family:'Sora','Arial',sans-serif">Split Screen</p>
+        <p class="text-xs text-gray-400 mt-0.5">Orange rail &amp; espresso field · duotone divider</p>
+      </div>
+      <div data-template="Arctic Frost" data-selected="false" onclick="app.selectTemplate('Arctic Frost')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #2E86C1;background:linear-gradient(180deg,#F2F8FD,#DCEBF7);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#F2F8FD;border:3px solid #6FB1DC;">
+          <span class="absolute top-[3px] right-[4px] w-1.5 h-1.5 rotate-45 bg-[#9DC9E8]"></span>
+          <span class="absolute top-[3px] left-[3px] h-1 rounded-sm bg-[#2E86C1]" style="width:30%"></span>
+          <span class="absolute top-[13px] left-[6px] h-2 bg-[#16324A]" style="width:56%"></span>
+          <span class="absolute bottom-[3px] left-[3px] h-1 rounded bg-[#1B6CA8]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#16324A;font-family:'Outfit', sans-serif">Arctic Frost</p>
+        <p class="text-xs text-gray-500 mt-0.5">Ice white &amp; glacier blue · minimal sans-serif</p>
+      </div>
+      <div data-template="Christmas" data-selected="false" onclick="app.selectTemplate('Christmas')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #FFD700;background:linear-gradient(180deg,#0B3D0E,#052207);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#0B3D0E;border:3px solid #FFD700;">
+          <span class="absolute top-[1px] left-[1px] h-1 rounded bg-[#FFD700]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#FFFFFF;font-family:'Cinzel', serif">Christmas</p>
+        <p class="text-xs text-gray-400 mt-0.5">Deep green &amp; neon green · festive serif</p>
+      </div>
+      <div data-template="Easter" data-selected="false" onclick="app.selectTemplate('Easter')" class="template-card relative rounded-2xl p-4 text-center cursor-pointer hover:scale-[1.015]" style="border:2px solid #8B4513;background:linear-gradient(180deg,#F5E6D3,#E8D4B5);">
+        <span class="sel-badge absolute top-2 right-2 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1.5 py-0.5 rounded-md">SELECTED</span>
+        <div class="relative mx-auto rounded-[7px] overflow-hidden" style="width:84px;height:47px;background:#F5E6D3;border:3px solid #8B4513;">
+          <span class="absolute top-[1px] left-[1px] h-1 rounded bg-[#8B4513]" style="width:28%"></span>
+        </div>
+        <p class="mt-3 font-black text-base" style="color:#4A2C1A;font-family:'Playfair Display', serif">Easter</p>
+        <p class="text-xs text-gray-400 mt-0.5">Parchment &amp; saddle brown · elegant serif</p>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- CONTENT BUILDER -->
+  <section id="view-step-3" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden animate-fade-in-up">
+
+    <!-- Selected Template Bar -->
+    <div class="glass rounded-2xl p-5 mb-6">
+      <div class="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
+        <div class="flex items-center gap-3">
+          <span id="current-step-label" class="text-xs uppercase tracking-widest text-slate-400">Content Builder</span>
+          <span class="text-slate-600">/</span>
+          <span class="text-xs uppercase tracking-widest text-amber-500">Template</span>
+          <span id="selected-template-name" class="text-xl font-bold text-white">Sermon Classic</span>
+        </div>
+        <button onclick="app.openModal('template-modal')" class="text-xs text-amber-300 hover:text-amber-200 glass-chip px-3 py-1.5 rounded-lg transition">Change…</button>
+      </div>
+
+      <!-- Add Slide Bar -->
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="text-xs uppercase tracking-widest text-slate-400">Add Slide</span>
+        <button onclick="app.openModal('title-modal')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-[#0B192C] font-black text-sm flex items-center gap-2 shadow-lg shadow-amber-500/25 hover:brightness-110"><i class="fa-solid fa-heading"></i> Title</button>
+        <button onclick="app.openModal('point-modal')" class="btn-glass"><i class="fa-solid fa-list-ul"></i> Point</button>
+        <button onclick="app.openModal('verse-modal')" class="btn-glass"><i class="fa-solid fa-book-open"></i> Verse</button>
+        <button onclick="app.openModal('message-modal')" class="btn-glass"><i class="fa-solid fa-message"></i> Message</button>
+        <span id="slide-count-badge" class="ml-auto text-xs text-slate-300 glass-chip px-3 py-1.5 rounded-full">0 slides</span>
+      </div>
+    </div>
+
+    <div class="grid xl:grid-cols-3 gap-6">
+
+      <!-- Slide Queue -->
+      <div class="xl:col-span-1">
+        <div class="glass rounded-2xl p-4 h-full">
+          <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-list-ol text-amber-400"></i> Slide Queue</h3>
+          <div id="slide-queue" class="empty-state">
+            <div class="empty-state-icon"><i class="fa-solid fa-list-ol text-amber-400 text-2xl"></i></div>
+            <p class="text-sm text-slate-400">No slides added yet. Click a button above to add your first slide.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Preview -->
+      <div class="xl:col-span-2">
+        <div class="glass rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-eye text-amber-400"></i> Live Preview</h3>
+            <span id="preview-label" class="text-xs text-slate-400"></span>
+          </div>
+          <div id="slide-preview" class="w-full max-w-3xl mx-auto">
+            <div class="aspect-video flex items-center justify-center glass-placeholder rounded-2xl">
+              <p class="text-xs text-slate-400 italic">Select a slide in the queue to preview it.</p>
+            </div>
+          </div>
+          <div class="flex justify-center gap-3 pt-2">
+            <button onclick="app.prevPreview()" class="btn-glass"><i class="fa-solid fa-chevron-left"></i> Prev</button>
+            <button onclick="app.enlargePreview()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-[#0B192C] font-bold text-sm flex items-center gap-2 shadow-lg shadow-amber-500/30 hover:brightness-110"><i class="fa-solid fa-expand"></i> Enlarge</button>
+            <button onclick="app.nextPreview()" class="btn-glass">Next <i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+          <div id="font-scale-bar" class="hidden justify-center pt-3 border-t border-white/10">
+            <div class="flex items-center gap-3 glass-chip rounded-full px-4 py-2">
+              <i class="fa-solid fa-font text-amber-400"></i>
+              <span id="font-scale-context" class="text-xs text-slate-300 font-semibold">Slide</span>
+              <button onclick="app.decrFontScale()" title="Smaller" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/25 text-white font-bold flex items-center justify-center transition">&#8722;</button>
+              <input id="font-scale-slider" type="range" min="50" max="200" step="5" value="100" class="w-36 sm:w-44 accent-amber-400 cursor-pointer" oninput="app.setFontScaleFromSlider(this.value)" />
+              <button onclick="app.incrFontScale()" title="Larger" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/25 text-white font-bold flex items-center justify-center transition">+</button>
+              <span id="font-scale-value" class="w-12 text-center text-sm font-bold text-amber-300">100%</span>
+              <button onclick="app.resetFontScale()" title="Reset to 100%" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white transition"><i class="fa-solid fa-rotate-left"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enlarge Modal -->
+  <div id="preview-modal" class="hidden fixed inset-0 bg-black/80 z-50 items-center justify-center p-4">
+    <div class="relative max-w-5xl w-full">
+      <button onclick="app.closeEnlargedPreview()" class="absolute -top-12 right-0 text-white hover:text-amber-400 transition"><i class="fa-solid fa-x text-2xl"></i></button>
+      <div id="enlarged-label" class="text-center text-sm text-gray-300 mb-4">Slide 1 of 1</div>
+      <div id="enlarged-slide" class="w-full"></div>
+      <div class="flex justify-center gap-4 mt-6">
+        <button onclick="app.prevPreview()" class="btn-glass font-semibold"><i class="fa-solid fa-chevron-left"></i> Prev</button>
+        <button onclick="app.nextPreview()" class="btn-glass font-semibold">Next <i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+      <div id="enlarged-font-scale-bar" class="hidden justify-center mt-4">
+        <div class="flex items-center gap-3 glass-chip rounded-full px-4 py-2">
+          <i class="fa-solid fa-font text-amber-400"></i>
+          <span id="enlarged-font-scale-context" class="text-xs text-slate-300 font-semibold">Slide</span>
+          <button onclick="app.decrFontScale()" title="Smaller" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/25 text-white font-bold flex items-center justify-center transition">&#8722;</button>
+          <input id="enlarged-font-scale-slider" type="range" min="50" max="200" step="5" value="100" class="w-48 sm:w-72 accent-amber-400 cursor-pointer" oninput="app.setFontScaleFromSlider(this.value)" />
+          <button onclick="app.incrFontScale()" title="Larger" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/25 text-white font-bold flex items-center justify-center transition">+</button>
+          <span id="enlarged-font-scale-value" class="w-12 text-center text-sm font-bold text-amber-300">100%</span>
+          <button onclick="app.resetFontScale()" title="Reset to 100%" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white transition"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+      <!-- Toast Area -->
+  <div id="toast-area" class="fixed bottom-6 right-6 z-40 space-y-3"></div>
+
+  <!-- Title Modal -->
+  <div id="title-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal-backdrop">
+    <div class="max-w-xl w-full mx-2 p-0 overflow-hidden modal-content">
+      <div class="px-6 py-4 border-b border-gray-700/50 flex justify-between items-center">
+        <h3 id="title-modal-heading" class="text-xl font-bold text-white">Add Title Slide</h3>
+        <button onclick="app.closeModal('title-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-x"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Sermon Title</label><input id="input-title" type="text" placeholder="Walking in unshakable hope" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Highlight Word(s) (Optional)</label><div id="title-highlight-fields" class="space-y-2"></div><button onclick="app.addHighlightRow('title-highlight-fields')" type="button" class="mt-2 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-sm hover:bg-amber-500/30">+ Add Highlight</button><p class="mt-1 text-xs text-gray-500">Add one phrase per field to highlight it. Leave all blank to show the title plainly.</p></div>
+        <div><label class="block text-sm font-medium text-white mb-1">Scripture Reference (Optional)</label><input id="input-verse" type="text" placeholder="Romans 8:28-39" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">FOOTER / WELCOME TEXT (OPTIONAL)</label><input id="input-title-footer" type="text" placeholder="e.g. Welcome to Worship" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div class="pt-4"><button id="title-modal-submit" onclick="app.addTitleSlide()" class="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-[#0B192C] font-black shadow-lg shadow-amber-500/30 hover:brightness-110">Add Title Slide</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Point Modal -->
+  <div id="point-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal-backdrop">
+    <div class="max-w-xl w-full mx-2 p-0 modal-content">
+      <div class="px-6 py-4 border-b border-gray-700/50 flex justify-between items-center">
+        <h3 id="point-modal-heading" class="text-xl font-bold text-white">Add Point Slide</h3>
+        <button onclick="app.closeModal('point-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-x"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Point Badge</label><input id="input-point-badge" type="text" placeholder="1" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Point Statement</label><input id="input-point-title" type="text" placeholder="What does unshakable hope look like?" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Highlight Word(s) (Optional)</label><div id="highlight-fields" class="space-y-2"></div><button onclick="app.addHighlightRow('highlight-fields')" type="button" class="mt-2 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-sm hover:bg-amber-500/30">+ Add Highlight</button><p class="mt-1 text-xs text-gray-500">Add one phrase per field to highlight it. Leave all blank to show the point with no highlights.</p></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Description (Optional)</label><input id="input-point-desc" type="text" placeholder="Because..." class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div class="pt-4"><button id="point-modal-submit" onclick="app.addPointSlide()" class="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-[#0B192C] font-black shadow-lg shadow-amber-500/30 hover:brightness-110">Add Point Slide</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verse Modal -->
+  <div id="verse-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal-backdrop">
+    <div class="max-w-xl w-full mx-2 p-0 modal-content">
+      <div class="px-6 py-4 border-b border-gray-700/50 flex justify-between items-center">
+        <h3 id="verse-modal-heading" class="text-xl font-bold text-white">Add Verse Slide</h3>
+        <button onclick="app.closeModal('verse-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-x"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Reference</label><input id="input-verse-ref" type="text" placeholder="Romans 8:28" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Verse Text</label><textarea id="input-verse-body" rows="4" placeholder="And we know that all things work together for good..." class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50"></textarea></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Version (Optional)</label><input id="input-verse-version" type="text" placeholder="NIV" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div class="pt-4"><button id="verse-modal-submit" onclick="app.addVerseSlide()" class="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-[#0B192C] font-black shadow-lg shadow-amber-500/30 hover:brightness-110">Add Verse Slide</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Modal -->
+  <div id="message-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal-backdrop">
+    <div class="max-w-xl w-full mx-2 p-0 modal-content">
+      <div class="px-6 py-4 border-b border-gray-700/50 flex justify-between items-center">
+        <h3 id="message-modal-heading" class="text-xl font-bold text-white">Add Message Slide</h3>
+        <button onclick="app.closeModal('message-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-x"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Message Text</label><textarea id="input-message-text" rows="4" placeholder="Type your message here..." class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50"></textarea></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Highlight Word(s) (Optional)</label><div id="message-highlight-fields" class="space-y-2"></div><button onclick="app.addHighlightRow('message-highlight-fields')" type="button" class="mt-2 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-sm hover:bg-amber-500/30">+ Add Highlight</button><p class="mt-1 text-xs text-gray-500">Add one phrase per field. Leave all blank to show the message plainly.</p></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Reference (Optional)</label><input id="input-message-ref" type="text" placeholder="e.g. Part 3: Walking in Hope" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div><label class="block text-sm font-medium text-amber-400 mb-1">Footer (Optional)</label><input id="input-message-footer" type="text" placeholder="e.g. Join us next week" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50" /></div>
+        <div class="pt-4"><button id="message-modal-submit" onclick="app.addMessageSlide()" class="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-[#0B192C] font-black shadow-lg shadow-amber-500/30 hover:brightness-110">Add Message Slide</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template Change Modal -->
+  <div id="template-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal-backdrop">
+    <div class="max-w-xl w-full mx-2 p-6 modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-white">Select Template</h3>
+        <button onclick="app.closeModal('template-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-x"></i></button>
+      </div>
+      <div class="space-y-3">
+        <div data-template="Sermon Classic" data-selected="true" onclick="app.selectTemplate('Sermon Classic')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #FFD700;background:linear-gradient(180deg,#0B192C,#050C16);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#0B192C;border:2px solid #FFD700;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] right-[1px] h-0.5 rounded-sm bg-[#FFD700]"></span>
+            <span class="absolute top-[6px] left-[1px] h-1 rounded bg-[#FFFFFF]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 rounded bg-[#FFF3B0]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#FFFFFF;font-family:'Inter', sans-serif">Sermon Classic</span>
+        </div>
+        <div data-template="Elegant Heritage" data-selected="false" onclick="app.selectTemplate('Elegant Heritage')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #9B2A2E;background:linear-gradient(180deg,#F6EFE6,#E8D9BF);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#F6EFE6;border:2px solid #9B2A2E;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] right-[1px] h-0.5 rounded-sm bg-[#9B2A2E]"></span>
+            <span class="absolute top-[6px] left-[1px] h-1 rounded bg-[#2B2118]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 rounded bg-[#C05A3B]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#2B2118;font-family:'Georgia', serif">Elegant Heritage</span>
+        </div>
+        <div data-template="Midnight Aurora" data-selected="false" onclick="app.selectTemplate('Midnight Aurora')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #22D3EE;background:linear-gradient(180deg,#0D1117,#161B22);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#0D1117;border:2px solid #22D3EE;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] right-[1px] h-0.5 rounded-sm bg-[#22D3EE]"></span>
+            <span class="absolute top-[6px] left-[1px] h-1 rounded bg-[#FFFFFF]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 rounded bg-[#A78BFA]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#FFFFFF;font-family:'Montserrat', sans-serif">Midnight Aurora</span>
+        </div>
+        <div data-template="Forest Chapel" data-selected="false" onclick="app.selectTemplate('Forest Chapel')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #D9B36C;background:linear-gradient(180deg,#0E2A1E,#06140E);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#0E2A1E;border:2px solid #D9B36C;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] right-[1px] h-0.5 rounded-sm bg-[#D9B36C]"></span>
+            <span class="absolute top-[6px] left-[1px] h-1 rounded bg-[#F6F1E3]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 rounded bg-[#F4E4BC]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#F6F1E3;font-family:'Cambria', serif">Forest Chapel</span>
+        </div>
+        <div data-template="Lilac Grace" data-selected="false" onclick="app.selectTemplate('Lilac Grace')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #8B5CF6;background:linear-gradient(180deg,#F3EEFC,#E8DDF9);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#F3EEFC;border:2px solid #8B5CF6;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] right-[1px] h-0.5 rounded-sm bg-[#7C3AED]"></span>
+            <span class="absolute top-[6px] left-[1px] h-1 rounded bg-[#2E1065]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 rounded bg-[#C4B5FD]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#2E1065;font-family:'Palatino', serif">Lilac Grace</span>
+        </div>
+        <div data-template="Rose Atelier" data-selected="false" onclick="app.selectTemplate('Rose Atelier')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #A64A52;background:linear-gradient(180deg,#FBF5EF,#F2E7DC);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#FBF5EF;border:2px solid #A64A52;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] right-[1px] h-0.5 rounded-sm bg-[#A64A52]"></span>
+            <span class="absolute top-[6px] left-[1px] h-1 rounded bg-[#3A2328]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 rounded bg-[#E2A9B0]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#3A2328;font-family:'Georgia', serif">Rose Atelier</span>
+        </div>
+        <div data-template="Fresh Mint" data-selected="false" onclick="app.selectTemplate('Fresh Mint')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #10B981;background:linear-gradient(180deg,#EAF6F0,#D5EEE3);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#EAF6F0;border:2px solid #10B981;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] right-[1px] h-0.5 rounded-sm bg-[#10B981]"></span>
+            <span class="absolute top-[6px] left-[1px] h-1 rounded bg-[#134E4A]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 rounded bg-[#6EE7B7]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#134E4A;font-family:'Poppins', sans-serif">Fresh Mint</span>
+        </div>
+        <div data-template="Ember & Gold" data-selected="false" onclick="app.selectTemplate('Ember & Gold')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #F59E0B;background:linear-gradient(180deg,#1C120C,#2A1B12);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#1C120C;border:2px solid #F59E0B;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] right-[1px] h-0.5 rounded-sm bg-[#F59E0B]"></span>
+            <span class="absolute top-[6px] left-[1px] h-1 rounded bg-[#FFF7ED]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 rounded bg-[#FB923C]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#FFF7ED;font-family:'Nunito', sans-serif">Ember &amp; Gold</span>
+        </div>
+        <div data-template="Royal Sapphire" data-selected="false" onclick="app.selectTemplate('Royal Sapphire')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #2563EB;background:linear-gradient(180deg,#0B1E3A,#071226);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#0B1E3A;border:2px solid #2563EB;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] right-[1px] h-0.5 rounded-sm bg-[#2563EB]"></span>
+            <span class="absolute top-[6px] left-[1px] h-1 rounded bg-[#EEF2FF]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 rounded bg-[#3B82F6]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#EEF2FF;font-family:'Barlow', sans-serif">Royal Sapphire</span>
+        </div>
+        <div data-template="Pulpit Grid" data-selected="false" onclick="app.selectTemplate('Pulpit Grid')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #DC2626;background:linear-gradient(180deg,#151515,#0C0C0C);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#151515;border:2px solid #DC2626;border-radius:5px;">
+            <span class="absolute top-[1px] left-[1px] w-1.5 h-1.5 bg-[#DC2626]"></span>
+            <span class="absolute top-[3px] left-[5px] h-1 bg-[#FAFAFA]" style="width:36%"></span>
+            <span class="absolute bottom-[1px] left-[1px] h-0.5 bg-[#D4D4D4]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#FAFAFA;font-family:'Oswald', sans-serif">Pulpit Grid</span>
+        </div>
+        <div data-template="Big Type" data-selected="false" onclick="app.selectTemplate('Big Type')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #E03A2F;background:linear-gradient(180deg,#F5F2EA,#ECE7DC);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#F5F2EA;border:2px solid #141414;border-radius:5px;">
+            <span class="absolute top-[2px] left-[3px] w-1 h-1 bg-[#E03A2F]"></span>
+            <span class="absolute top-[5px] left-[6px] h-1.5 bg-[#141414]" style="width:58%"></span>
+            <span class="absolute top-[12px] left-[6px] h-1.5 bg-[#141414]" style="width:42%"></span>
+            <span class="absolute top-[21px] left-[3px] right-[3px] h-px bg-[#141414]/50"></span>
+            <span class="absolute bottom-[3px] left-[6px] h-0.5 bg-[#E03A2F]" style="width:26%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#141414;font-family:'Archivo Black','Arial Black', sans-serif">Big Type</span>
+        </div>
+        <div data-template="Glory Light" data-selected="false" onclick="app.selectTemplate('Glory Light')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #E8C86A;background:linear-gradient(180deg,#050505,#0A0A0A);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative overflow-hidden" style="width:52px;height:29px;background:#050505;border:1.5px solid #D4AF37;border-radius:4px;">
+            <span class="absolute" style="left:17px;top:-18px;width:14px;height:62px;background:linear-gradient(180deg,rgba(212,168,44,.55),rgba(212,168,44,0));transform:rotate(12deg);transform-origin:50% 0;"></span>
+            <span class="absolute" style="left:20px;top:-18px;width:8px;height:62px;background:linear-gradient(180deg,rgba(232,200,106,.8),rgba(232,200,106,0));transform:rotate(12deg);transform-origin:50% 0;"></span>
+            <span class="absolute" style="left:19px;top:5px;width:16px;height:2px;background:rgba(232,200,106,.95);border-radius:1px;"></span>
+            <span class="absolute" style="left:15px;top:11px;width:24px;height:6px;background:rgba(255,255,255,.92);border-radius:1px;"></span>
+            <span class="absolute" style="left:21px;top:22px;width:12px;height:1px;background:rgba(212,175,55,.9);"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#FFFFFF;font-family:'Playfair Display','Georgia',serif">Glory Light</span>
+        </div>
+        <div data-template="Celestial Dawn" data-selected="false" onclick="app.selectTemplate('Celestial Dawn')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #C084FC;background:linear-gradient(180deg,#0F0C29,#0A0820);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative overflow-hidden" style="width:52px;height:29px;background:#0F0C29;border:1.5px solid #C084FC;border-radius:4px;">
+            <span class="absolute" style="left:-4px;top:-6px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.6),rgba(124,58,237,0) 70%);"></span>
+            <span class="absolute" style="left:34px;top:20px;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle,rgba(232,121,249,.5),rgba(232,121,249,0) 70%);"></span>
+            <div class="absolute" style="left:8px;top:5px;width:36px;height:19px;border-radius:5px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.35);">
+              <span class="absolute rounded-sm" style="left:9px;top:6px;width:22px;height:5px;background:rgba(255,255,255,.92);"></span>
+              <span class="absolute rounded-sm" style="left:15px;top:13.5px;width:10px;height:2.5px;background:rgba(255,255,255,.55);"></span>
+            </div>
+          </div>
+          <span class="font-black text-sm" style="color:#FFFFFF;font-family:'Outfit',sans-serif">Celestial Dawn</span>
+        </div>
+        <div data-template="Split Screen" data-selected="false" onclick="app.selectTemplate('Split Screen')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #E85D26;background:linear-gradient(180deg,#1B1310,#14100C);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative overflow-hidden" style="width:52px;height:29px;background:#1B1310;border:1.5px solid #E85D26;border-radius:4px;">
+            <span class="absolute" style="left:0;top:0;width:16px;height:100%;background:#E85D26;"></span>
+            <span class="absolute" style="left:16px;top:0;width:1px;height:100%;background:rgba(255,246,236,.5);"></span>
+            <span class="absolute rounded-sm" style="left:3px;top:3px;width:10px;height:1.5px;background:rgba(27,19,16,.85);"></span>
+            <span class="absolute rounded-sm" style="left:3px;bottom:3px;width:8px;height:1.5px;background:rgba(27,19,16,.6);"></span>
+            <span class="absolute" style="left:11px;top:8px;color:#FFF6EC;font-size:9px;font-weight:800;line-height:1.3;">02</span>
+            <span class="absolute rounded-sm" style="left:20px;top:8px;width:24px;height:4px;background:rgba(255,246,236,.92);"></span>
+            <span class="absolute rounded-sm" style="left:20px;top:14px;width:16px;height:2.5px;background:rgba(255,138,80,.85);"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#FFF6EC;font-family:'Sora','Arial',sans-serif">Split Screen</span>
+        </div>
+        <div data-template="Arctic Frost" data-selected="false" onclick="app.selectTemplate('Arctic Frost')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #2E86C1;background:linear-gradient(180deg,#F2F8FD,#DCEBF7);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative" style="width:52px;height:29px;background:#F2F8FD;border:2px solid #6FB1DC;border-radius:5px;">
+            <span class="absolute top-[2px] right-[3px] w-1 h-1 rotate-45 bg-[#9DC9E8]"></span>
+            <span class="absolute top-[2px] left-[2px] h-0.5 rounded-sm bg-[#2E86C1]" style="width:30%"></span>
+            <span class="absolute top-[8px] left-[4px] h-1.5 bg-[#16324A]" style="width:58%"></span>
+            <span class="absolute bottom-[2px] left-[2px] h-0.5 rounded bg-[#1B6CA8]" style="width:22%"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#16324A;font-family:'Outfit',sans-serif">Arctic Frost</span>
+        </div>
+        <div data-template="Christmas" data-selected="false" onclick="app.selectTemplate('Christmas')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #FFD700;background:linear-gradient(180deg,#0B3D0E,#052207);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative overflow-hidden" style="width:52px;height:29px;background:#0B3D0E;border:2px solid #FFD700;border-radius:4px;">
+            <span class="absolute" style="left:0;top:0;width:16px;height:100%;background:#FFD700;"></span>
+            <span class="absolute rounded-sm" style="left:4px;top:4px;width:16px;height:2px;background:#0B3D0E;"></span>
+            <span class="absolute rounded-sm" style="left:4px;bottom:4px;width:12px;height:2px;background:#0B3D0E;"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#FFFFFF;font-family:'Cinzel',sans-serif">Christmas</span>
+        </div>
+        <div data-template="Easter" data-selected="false" onclick="app.selectTemplate('Easter')" class="template-card relative flex items-center gap-2 p-2 rounded-lg text-left cursor-pointer hover:bg-amber-500/10 transition" style="border:2px solid #8B4513;background:linear-gradient(180deg,#F5E6D3,#E8D4B5);">
+          <span class="sel-badge absolute top-1 right-1 bg-amber-400 text-[#0B192C] text-[9px] font-black px-1 py-0.5 rounded-md">SELECTED</span>
+          <div class="relative overflow-hidden" style="width:52px;height:29px;background:#F5E6D3;border:2px solid #8B4513;border-radius:4px;">
+            <span class="absolute" style="left:0;top:0;width:16px;height:100%;background:#8B4513;"></span>
+            <span class="absolute rounded-sm" style="left:4px;top:4px;width:16px;height:2px;background:#F5E6D3;"></span>
+            <span class="absolute rounded-sm" style="left:4px;bottom:4px;width:12px;height:2px;background:#F5E6D3;"></span>
+          </div>
+          <span class="font-black text-sm" style="color:#4A2C1A;font-family:'Playfair Display',sans-serif">Easter</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js?v=20260911"></script>
+  <script>app.init(); // init() restores saved slides/template, but always opens on the Get Started page (step 1)</script>
+</body>
+</html>
+
+
+
+

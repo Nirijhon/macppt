@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slide Not Found — SlideCraft Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body {
+      background-color: #0A1226 !important; /* fallback while the photo loads */
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: var(--theme-bg, url('image.png'));
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(5px) saturate(125%) brightness(1.02);
+      transform: scale(1.07); /* hides the softened edges */
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: linear-gradient(170deg,
+        rgba(6, 12, 28, .68) 0%,
+        rgba(9, 17, 38, .42) 45%,
+        rgba(24, 16, 48, .74) 100%);
+    }
+    .glass {
+      background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 16px 40px rgba(2,6,23,.45), inset 0 1px 0 rgba(255,255,255,.16);
+    }
+    .gold { color: #FFD700; }
+    .gold-bg { background: linear-gradient(180deg, #FFD700, #FBBF24); }
+    .golden-glow { box-shadow: 0 0 0 3px rgba(255,215,0,.25), 0 8px 26px rgba(255,215,0,.18); }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center text-slate-100 p-4">
+  <div class="max-w-xl w-full mx-4">
+    <div class="glass rounded-3xl px-8 py-12 text-center relative overflow-hidden">
+      <div class="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-indigo-500/25 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-20 w-56 h-56 rounded-full bg-violet-500/25 blur-3xl pointer-events-none"></div>
+
+      <!-- Ornamental gold divider -->
+      <div class="relative h-px w-3/4 mx-auto bg-white/20 mb-8 flex items-center justify-center">
+        <span class="w-10 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></span>
+        <span class="absolute top-1/2 w-3 h-3 rounded-full gold-bg -translate-y-1/2"></span>
+      </div>
+
+      <i class="fa-solid fa-mountain-sun gold text-7xl mb-5 drop-shadow-[0_10px_20px_rgba(255,215,0,.35)]"></i>
+      <h1 class="text-6xl sm:text-7xl font-black mb-2" style="background:linear-gradient(120deg,#FFD700,#FFB703 55%,#fff);-webkit-background-clip:text;background-clip:text;color:transparent">404</h1>
+      <p class="text-white text-lg font-semibold mb-1">Oops — that slide hasn’t been crafted yet.</p>
+      <p class="text-sm text-slate-400 mb-8">The page you’re looking for doesn’t exist or was removed.</p>
+
+      <a href="/" class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl gold-bg text-[#0B192C] font-black tracking-wider golden-glow hover:brightness-110 transition">
+        <i class="fa-solid fa-arrow-left"></i> Back to the Studio
+      </a>
+
+      <div class="relative h-px w-3/4 mx-auto bg-white/20 mt-8 flex items-center justify-center">
+        <span class="w-10 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></span>
+        <span class="absolute top-1/2 w-3 h-3 rounded-full gold-bg -translate-y-1/2"></span>
+      </div>
+    </div>
+
+    <p class="mt-6 text-center text-xs text-slate-500">SlideCraft Studio · Brand your sermon slides in seconds.</p>
+  </div>
+</body>
+</html>
