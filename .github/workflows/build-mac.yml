@@ -1,0 +1,63 @@
+# Build Mac App — produces the macOS .dmg for SlideCraft Studio
+#
+#   - Apple Silicon (M1/M2/M3 MacBook Air) + Intel — both archs in one run
+#   - Runs on GitHub's macOS runner: you do NOT need a Mac to build this
+#   - The build is UNSIGNED: first launch needs right-click → Open (see desktop/README.md)
+#
+# Triggers:
+#   - Push a tag:        git tag v1.0.0 && git push --tags
+#   - Or run manually:   Repo → Actions → "Build Mac App" → Run workflow
+#
+# NOTE: GitHub Actions only reads workflows from .github/workflows/ — this file
+# is mirrored at workflows/build-mac.yml for reference. Edit the copy under
+# .github/workflows/ (or both) when making changes.
+
+name: Build Mac App
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-mac:
+    name: macOS DMG (Apple Silicon + Intel)
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: "Copy the site into desktop/app (single source of truth: PPT/)"
+        shell: bash
+        run: |
+          rm -rf app
+          mkdir -p app/js app/components
+          cp ../PPT/index.html ../PPT/404.html ../PPT/README.md ../PPT/serve.js ../PPT/image.png ../PPT/logo.png app/
+          cp ../PPT/*.jpg app/
+          cp ../PPT/js/app.js app/js/
+          cp ../PPT/components/*.html app/components/
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build DMG (arm64 + x64)
+        run: npx electron-builder --mac --publish never
+        env:
+          # No Apple signing certificate configured — build unsigned.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Upload macOS DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlideCraft-macOS
+          path: desktop/dist/*.dmg
+          if-no-files-found: error
